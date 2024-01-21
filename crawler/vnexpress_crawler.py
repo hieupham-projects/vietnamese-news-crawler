@@ -69,12 +69,15 @@ class VnExpressCrawler(BaseCrawler):
         for i in tqdm(range(len(unix_timestamp_list))):
             unix_timestamp = unix_timestamp_list[i]
             url = f"https://vnexpress.net/category/day/cateid/{self.crawled_category}/fromdate/{unix_timestamp}/todate/{unix_timestamp}"
-            reponse = requests.get(url)
-            soup = BeautifulSoup(reponse.text, "lxml")
-            title_news = soup.find_all("h3", class_="title-news")
+            try:
+                reponse = requests.get(url)
+                soup = BeautifulSoup(reponse.text, "lxml")
+                title_news = soup.find_all("h3", class_="title-news")
 
-            for new in title_news:
-                urls.append(new.a["href"])
+                for new in title_news:
+                    urls.append(new.a["href"])
+            except:
+                logger.debug(f"Error at {url}")
         return urls
 
     def _crawl_articles(self, urls: List[str]) -> List[str]:
