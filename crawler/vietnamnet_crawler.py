@@ -61,6 +61,8 @@ class VietnamnetCrawler(BaseCrawler):
         articles = []
         for url in tqdm(urls):
             try:
+                if "https://vietnamnet.vn/" not in url:
+                    url = f"https://vietnamnet.vn/{url}"
                 response = requests.get(url)
                 soup = BeautifulSoup(response.text, "lxml")
                 breadcrumb = soup.find("div", class_="bread-crumb-detail sm-show-time")
