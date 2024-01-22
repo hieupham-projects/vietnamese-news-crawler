@@ -1,5 +1,6 @@
 import argparse
 import json
+
 from crawler.crawler_arguments import CrawlerArguments
 from crawler.crawler_factory import CrawlerFactory
 

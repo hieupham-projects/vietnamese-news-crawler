@@ -1,15 +1,14 @@
 # This file contains the crawler for vnexpress.net
+import time
 from typing import List
 
+import requests
 from bs4 import BeautifulSoup
+from loguru import logger
+from tqdm import tqdm
 
 from .base_crawler import BaseCrawler
 from .crawler_arguments import CrawlerArguments
-import time
-import requests
-
-from tqdm import tqdm
-from loguru import logger
 
 
 class VnExpressCrawler(BaseCrawler):
@@ -34,7 +33,8 @@ class VnExpressCrawler(BaseCrawler):
             "suc-khoe": 1003750,
         }
         logger.debug(self.arguments.category)
-        self.crawled_category = self.categories[self.arguments.category]
+        if self.arguments.category in self.categories.keys():
+            self.crawled_category = self.categories[self.arguments.category]
 
     def generate_date_range(self) -> List[str]:
         start_day, start_month, start_year = self.arguments.start_range.split("/")
@@ -76,8 +76,8 @@ class VnExpressCrawler(BaseCrawler):
 
                 for new in title_news:
                     urls.append(new.a["href"])
-            except:
-                logger.debug(f"Error at {url}")
+            except Exception as e:
+                logger.debug(f"Error {e} at {url}")
         return urls
 
     def _crawl_articles(self, urls: List[str]) -> List[str]:
@@ -103,6 +103,6 @@ class VnExpressCrawler(BaseCrawler):
                 }
                 articles.append(item)
             except Exception as e:
-                logger.debug(f"{e} at {url}")
+                logger.debug(f"Error {e} at {url}")
 
         return articles
