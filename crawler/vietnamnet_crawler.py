@@ -30,9 +30,7 @@ class VietnamnetCrawler(BaseCrawler):
             "du-lich",
             "oto-xe-may",
         ]
-        if self.arguments.category not in self.category:
-            raise ValueError("Category not found")
-        else:
+        if self.arguments.category in self.category:
             self.crawled_category = self.arguments.category
 
     def _crawl_urls(self) -> List[str]:
