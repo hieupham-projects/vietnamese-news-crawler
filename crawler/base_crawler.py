@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import List
+from typing import List, Optional
 
 from .crawler_arguments import CrawlerArguments
 
@@ -15,9 +15,9 @@ class BaseCrawler(object):
     def _crawl_urls(self) -> List[str]:
         pass
 
-    def crawl_articles(self, urls: List[str]) -> List[str]:
+    def crawl_articles(self, urls: Optional[str]) -> Optional[str]:
         return self._crawl_articles(urls)
 
     @abstractmethod
-    def _crawl_articles(self, urls: List[str]) -> List[str]:
+    def _crawl_articles(self, urls: Optional[str]) -> Optional[str]:
         pass

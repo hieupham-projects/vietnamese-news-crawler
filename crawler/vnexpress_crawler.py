@@ -1,6 +1,6 @@
 # This file contains the crawler for vnexpress.net
 import time
-from typing import List
+from typing import List, Optional
 
 import requests
 from bs4 import BeautifulSoup
@@ -80,29 +80,22 @@ class VnExpressCrawler(BaseCrawler):
                 logger.debug(f"Error {e} at {url}")
         return urls
 
-    def _crawl_articles(self, urls: List[str]) -> List[str]:
-        logger.info("Start crawling articles")
-        articles = []
-        for i in tqdm(range(len(urls))):
-            url = urls[i]
-            try:
-                reponse = requests.get(url)
-                soup = BeautifulSoup(reponse.text, "lxml")
-                breadcrumb = soup.find("ul", class_="breadcrumb")
-                category = breadcrumb.find_all("li")[0].text.strip()
-                title = soup.find("h1", class_="title-detail").text.strip()
-                content_tags = soup.find_all("p", class_="Normal")
-                content = [tag.text.strip() for tag in content_tags]
-                author = content.pop(-1)
-                content = "\n".join(content)
-                item = {
-                    "title": title,
-                    "author": author,
-                    "category": category,
-                    "content": content,
-                }
-                articles.append(item)
-            except Exception as e:
-                logger.debug(f"Error {e} at {url}")
-
-        return articles
+    def _crawl_articles(self, url: Optional[str]) -> Optional[str]:
+        try:
+            reponse = requests.get(url)
+            soup = BeautifulSoup(reponse.text, "lxml")
+            breadcrumb = soup.find("ul", class_="breadcrumb")
+            category = breadcrumb.find_all("li")[0].text.strip()
+            title = soup.find("h1", class_="title-detail").text.strip()
+            content_tags = soup.find_all("p", class_="Normal")
+            content = [tag.text.strip() for tag in content_tags]
+            author = content.pop(-1)
+            content = "\n".join(content)
+            return {
+                "title": title,
+                "author": author,
+                "category": category,
+                "content": content,
+            }
+        except Exception as e:
+            logger.debug(f"Error {e} at {url}")

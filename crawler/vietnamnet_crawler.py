@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import requests
 from bs4 import BeautifulSoup
@@ -56,53 +56,47 @@ class VietnamnetCrawler(BaseCrawler):
                 logger.debug(f"Error {e} at {url}")
         return urls
 
-    def _crawl_articles(self, urls: List[str]) -> List[str]:
-        logger.info("Start crawling articles")
-        articles = []
-        for url in tqdm(urls):
-            try:
-                if "https://vietnamnet.vn/" not in url:
-                    url = f"https://vietnamnet.vn/{url}"
-                response = requests.get(url)
-                soup = BeautifulSoup(response.text, "lxml")
-                breadcrumb = soup.find("div", class_="bread-crumb-detail sm-show-time")
-                category = breadcrumb.find_all("li")[1].find("a").text.strip()
-                title = soup.find("h1", class_="content-detail-title").text.strip()
-                description = soup.find(
-                    "h2", class_="content-detail-sapo sm-sapo-mb-0"
-                ).text
-                author_tag = soup.find("span", class_="name")
-                content_tags = soup.find_all("p")
-                if content_tags:
-                    content = (
-                        description
-                        + "\n"
-                        + "\n".join(
-                            [
-                                tag.text.strip()
-                                for tag in content_tags
-                                if len(tag.text.split()) > 0
-                            ]
-                        )
+    def _crawl_articles(self, url: Optional[str]) -> Optional[str]:
+        try:
+            if "https://vietnamnet.vn/" not in url:
+                url = f"https://vietnamnet.vn/{url}"
+            response = requests.get(url)
+            soup = BeautifulSoup(response.text, "lxml")
+            breadcrumb = soup.find("div", class_="bread-crumb-detail sm-show-time")
+            category = breadcrumb.find_all("li")[1].find("a").text.strip()
+            title = soup.find("h1", class_="content-detail-title").text.strip()
+            description = soup.find(
+                "h2", class_="content-detail-sapo sm-sapo-mb-0"
+            ).text
+            author_tag = soup.find("span", class_="name")
+            content_tags = soup.find_all("p")
+            if content_tags:
+                content = (
+                    description
+                    + "\n"
+                    + "\n".join(
+                        [
+                            tag.text.strip()
+                            for tag in content_tags
+                            if len(tag.text.split()) > 0
+                        ]
                     )
-                else:
-                    content = description
-
-                if author_tag:
-                    author = author_tag.find("a").text.strip()
-                    content = content.replace(author, "")
-                else:
-                    author = ""
-
-                content = content.replace("\nChủ đề:", "")
-                articles.append(
-                    {
-                        "title": title,
-                        "author": author,
-                        "category": category,
-                        "content": content,
-                    }
                 )
-            except Exception as e:
-                logger.debug(f"Error {e} at {url}")
-        return articles
+            else:
+                content = description
+
+            if author_tag:
+                author = author_tag.find("a").text.strip()
+                content = content.replace(author, "")
+            else:
+                author = ""
+
+            content = content.replace("\nChủ đề:", "")
+            return {
+                "title": title,
+                "author": author,
+                "category": category,
+                "content": content,
+            }
+        except Exception as e:
+            logger.debug(f"Error {e} at {url}")
