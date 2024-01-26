@@ -32,6 +32,7 @@ if __name__ == "__main__":
         )
 
     articles = [content for content in results_iter if content]
+    articles = [dict(t) for t in {tuple(d.items()) for d in articles}]
     # Dump the list of objects to a JSON file
     with open(args.output_file_path, "w", encoding="utf-8") as json_file:
         json.dump(articles, json_file, ensure_ascii=False, indent=4)
