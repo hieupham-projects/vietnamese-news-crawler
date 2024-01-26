@@ -29,6 +29,7 @@ class VietnamnetCrawler(BaseCrawler):
             "bat-dong-san",
             "du-lich",
             "oto-xe-may",
+            "ban-doc",
         ]
         if self.arguments.category in self.category:
             self.crawled_category = self.arguments.category
@@ -71,19 +72,15 @@ class VietnamnetCrawler(BaseCrawler):
             author_tag = soup.find("span", class_="name")
             content_tags = soup.find_all("p")
             if content_tags:
-                content = (
-                    description
-                    + "\n"
-                    + "\n".join(
-                        [
-                            tag.text.strip()
-                            for tag in content_tags
-                            if len(tag.text.split()) > 0
-                        ]
-                    )
+                content = "\n".join(
+                    [
+                        tag.text.strip()
+                        for tag in content_tags
+                        if len(tag.text.split()) > 0
+                    ]
                 )
             else:
-                content = description
+                pass
 
             if author_tag:
                 author = author_tag.find("a").text.strip()
@@ -97,6 +94,7 @@ class VietnamnetCrawler(BaseCrawler):
                 "author": author,
                 "category": category,
                 "content": content,
+                "description": description,
             }
         except Exception as e:
             logger.debug(f"Error {e} at {url}")
