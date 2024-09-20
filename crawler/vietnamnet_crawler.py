@@ -89,6 +89,7 @@ class VietnamnetCrawler(BaseCrawler):
                 author = ""
 
             content = content.replace("\nChủ đề:", "")
+
             return {
                 "title": title,
                 "author": author,
